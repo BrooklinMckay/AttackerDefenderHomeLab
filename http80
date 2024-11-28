@@ -1,1 +1,48 @@
+Set Up the Environment:
 
+    Install Metasploitable v2: Deploy the Metasploitable v2 virtual machine, which is intentionally designed with vulnerabilities for testing and educational purposes.
+    Install Kali Linux: Use Kali Linux as the attacking machine, equipped with various penetration testing tools.
+
+Identify Open Ports:
+
+    Use Nmap for Scanning:
+        Open a terminal in Kali Linux.
+        Execute the command: nmap -sV [Target IP]
+            -sV: Detects service versions.
+        Review the scan results to identify open ports and services. Look for port 25, which is commonly used for SMTP.
+
+Enumerate SMTP Service:
+
+    Connect via Netcat:
+        In the terminal, type: nc [Target IP] 25
+        Observe the SMTP banner to gather information about the service.
+    Use Telnet for Interaction:
+        Enter: telnet [Target IP] 25
+        After connecting, type HELP to list available SMTP commands.
+        Note any additional information provided by the server.
+
+Exploit SMTP for User Enumeration:
+
+    Utilize Metasploit Framework:
+        Launch Metasploit by typing msfconsole in the terminal.
+        Search for relevant SMTP auxiliary modules:
+            search smtp
+        Select the appropriate module for user enumeration:
+            use auxiliary/scanner/smtp/smtp_enum
+        Configure the module:
+            set RHOSTS [Target IP]
+            set USER_FILE /path/to/userlist.txt (a list of potential usernames)
+        Execute the module:
+            run
+        Analyze the output to identify valid usernames.
+
+Attempt to Retrieve Passwords:
+
+    SMTP VRFY Command:
+        While connected via Telnet or Netcat, use the VRFY command to verify user existence:
+            VRFY username
+        A positive response indicates the user exists.
+    Brute-Force Attack:
+        Employ tools like Hydra to perform a brute-force attack using the obtained usernames:
+            hydra -l [username] -P /path/to/passwordlist.txt smtp://[Target IP] -V
+        Monitor the output for successful login attempts.
